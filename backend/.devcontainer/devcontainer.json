@@ -9,7 +9,7 @@
       ]
     }
   },
-  "postCreateCommand": "cd backend && npm install && npm install -g azure-functions-core-tools@4 --unsafe-perm true",
+  "postCreateCommand": "npm install && npm install -g azure-functions-core-tools@4 --unsafe-perm true",
   "forwardPorts": [
     7071
   ],
