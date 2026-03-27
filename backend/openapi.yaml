@@ -6,7 +6,7 @@ info:
 servers:
   - url: http://localhost:7071/api
     description: Local development server
-  - url: https://expense-tracker.azurewebsites.net/api
+  - url: https://exptracker-function-expensetracker.azurewebsites.net/api
     description: Azure production server
 
 paths:
@@ -40,18 +40,18 @@ paths:
                   minLength: 6
                   example: "123456"
       responses:
-        '201':
+        "201":
           description: User created successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AuthResponse'
-        '400':
+                $ref: "#/components/schemas/AuthResponse"
+        "400":
           description: Validation error or email already exists
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
 
   /login:
     post:
@@ -78,18 +78,18 @@ paths:
                   format: password
                   example: "123456"
       responses:
-        '200':
+        "200":
           description: Login successful
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AuthResponse'
-        '401':
+                $ref: "#/components/schemas/AuthResponse"
+        "401":
           description: Invalid credentials
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
 
   /refreshToken:
     post:
@@ -110,7 +110,7 @@ paths:
                   type: string
                   example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
       responses:
-        '200':
+        "200":
           description: New access token generated
           content:
             application/json:
@@ -120,12 +120,12 @@ paths:
                   accessToken:
                     type: string
                     example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-        '401':
+        "401":
           description: Invalid or expired refresh token
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
 
   /getAccounts:
     get:
@@ -136,7 +136,7 @@ paths:
       security:
         - BearerAuth: []
       responses:
-        '200':
+        "200":
           description: List of accounts
           content:
             application/json:
@@ -146,13 +146,13 @@ paths:
                   accounts:
                     type: array
                     items:
-                      $ref: '#/components/schemas/Account'
-        '401':
+                      $ref: "#/components/schemas/Account"
+        "401":
           description: Unauthorized
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
 
   /createAccount:
     post:
@@ -179,7 +179,7 @@ paths:
                   type: string
                   example: "1234"
       responses:
-        '201':
+        "201":
           description: Account created
           content:
             application/json:
@@ -187,19 +187,19 @@ paths:
                 type: object
                 properties:
                   account:
-                    $ref: '#/components/schemas/Account'
-        '400':
+                    $ref: "#/components/schemas/Account"
+        "400":
           description: Validation error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '401':
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
           description: Unauthorized
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
 
   /updateAccount:
     put:
@@ -230,7 +230,7 @@ paths:
                   type: string
                   example: "5678"
       responses:
-        '200':
+        "200":
           description: Account updated
           content:
             application/json:
@@ -238,25 +238,25 @@ paths:
                 type: object
                 properties:
                   account:
-                    $ref: '#/components/schemas/Account'
-        '400':
+                    $ref: "#/components/schemas/Account"
+        "400":
           description: Validation error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '401':
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
           description: Unauthorized
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '404':
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
           description: Account not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
 
   /deleteAccount:
     delete:
@@ -274,7 +274,7 @@ paths:
             type: string
           description: Account ID
       responses:
-        '200':
+        "200":
           description: Account deleted
           content:
             application/json:
@@ -284,18 +284,18 @@ paths:
                   message:
                     type: string
                     example: Account deleted successfully
-        '401':
+        "401":
           description: Unauthorized
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '404':
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
           description: Account not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
 
   /expensemetric:
     post:
@@ -319,7 +319,7 @@ paths:
                   description: Raw SMS message to parse
                   example: "UPI transaction of Rs.500.00 debited from A/C XX1234"
       responses:
-        '200':
+        "200":
           description: Transaction stored successfully
           content:
             application/json:
@@ -330,24 +330,24 @@ paths:
                     type: string
                   transaction:
                     type: object
-        '400':
+        "400":
           description: Message is required
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '401':
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
           description: Unauthorized
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '500':
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
           description: Internal server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
 
 components:
   securitySchemes:
@@ -383,7 +383,7 @@ components:
       type: object
       properties:
         user:
-          $ref: '#/components/schemas/User'
+          $ref: "#/components/schemas/User"
         accessToken:
           type: string
           example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI1MDdmMWY3N2JjZjg2Y2Q3OTk0MzkwMTEiLCJpYXQiOjE3MDQ1MTIwMDAsImV4cCI6MTcwNDUxNTYwMH0.XYZ...
