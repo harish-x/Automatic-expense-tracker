@@ -1,23 +1,25 @@
 {
-  "name": "Expense Tracker Backend",
-  "image": "mcr.microsoft.com/devcontainers/javascript-node:22",
-  "customizations": {
-    "vscode": {
-      "extensions": [
-        "ms-azuretools.vscode-azurefunctions",
-        "dbaeumer.vscode-eslint"
-      ]
-    }
-  },
-  "postCreateCommand": "npm install && npm install -g azure-functions-core-tools@4 --unsafe-perm true",
-  "forwardPorts": [
-    7071
-  ],
+  "name": "Azure Functions (Node.js 22)",
+  "image": "mcr.microsoft.com/azure-functions/node:4-node22",
+  "forwardPorts": [7071],
   "portsAttributes": {
     "7071": {
       "label": "Azure Functions",
       "onAutoForward": "notify"
     }
   },
-  "remoteUser": "node"
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-azuretools.vscode-azurefunctions",
+        "ms-vscode.vscode-node-azure-pack"
+      ],
+      "settings": {
+        "azureFunctions.deploySubpath": ".",
+        "azureFunctions.projectRuntime": "~4",
+        "azureFunctions.projectLanguage": "JavaScript"
+      }
+    }
+  },
+  "postCreateCommand": "npm install"
 }

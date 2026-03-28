@@ -76,6 +76,7 @@ paths:
                 password:
                   type: string
                   format: password
+                  minLength: 1
                   example: "123456"
       responses:
         "200":
@@ -86,6 +87,12 @@ paths:
                 $ref: "#/components/schemas/AuthResponse"
         "401":
           description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "400":
+          description: Validation error
           content:
             application/json:
               schema:
@@ -122,6 +129,12 @@ paths:
                     example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
         "401":
           description: Invalid or expired refresh token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "400":
+          description: Validation error
           content:
             application/json:
               schema:
@@ -174,9 +187,11 @@ paths:
               properties:
                 bank_name:
                   type: string
+                  minLength: 1
                   example: Chase Bank
                 account_mask:
                   type: string
+                  minLength: 1
                   example: "1234"
       responses:
         "201":
@@ -215,6 +230,7 @@ paths:
           required: true
           schema:
             type: string
+            minLength: 1
           description: Account ID
       requestBody:
         required: true
@@ -222,12 +238,15 @@ paths:
           application/json:
             schema:
               type: object
+              minProperties: 1
               properties:
                 bank_name:
                   type: string
+                  minLength: 1
                   example: Bank of America
                 account_mask:
                   type: string
+                  minLength: 1
                   example: "5678"
       responses:
         "200":
@@ -272,6 +291,7 @@ paths:
           required: true
           schema:
             type: string
+            minLength: 1
           description: Account ID
       responses:
         "200":

@@ -1,7 +1,35 @@
 const { app } = require('@azure/functions');
+const { z } = require('zod');
 const { connectToDatabase } = require('../db');
 const Account = require('../models/accounts');
 const { authMiddleware } = require('../middleware/auth');
+
+const createAccountSchema = z.object({
+    bank_name: z.string().min(1, 'Bank name is required'),
+    account_mask: z.string().min(1, 'Account mask is required')
+});
+
+const updateAccountSchema = z.object({
+    bank_name: z.string().min(1, 'Bank name cannot be empty').optional(),
+    account_mask: z.string().min(1, 'Account mask cannot be empty').optional()
+}).refine(data => data.bank_name || data.account_mask, {
+    message: 'At least one field (bank_name or account_mask) is required'
+});
+
+const idQuerySchema = z.object({
+    id: z.string().min(1, 'Account ID is required')
+});
+
+function validateRequest(schema, data) {
+    const result = schema.safeParse(data);
+    if (!result.success) {
+        const errors = result.error.issues?.map(e => e.message).join(', ')
+            || result.error.message
+            || 'Validation failed';
+        return { error: errors, status: 400 };
+    }
+    return { data: result.data };
+}
 
 app.http('createAccount', {
     methods: ['POST'],
@@ -14,11 +42,12 @@ app.http('createAccount', {
             }
 
             const body = await request.json();
-            const { bank_name, account_mask } = body;
-
-            if (!bank_name || !account_mask) {
-                return { status: 400, jsonBody: { error: 'Bank name and account mask are required' } };
+            const validation = validateRequest(createAccountSchema, body);
+            if (validation.error) {
+                return { status: validation.status, jsonBody: { error: validation.error } };
             }
+
+            const { bank_name, account_mask } = validation.data;
 
             await connectToDatabase();
 
@@ -48,13 +77,19 @@ app.http('updateAccount', {
                 return { status: auth.status, jsonBody: { error: auth.error } };
             }
 
-            const accountId = request.query.get('id');
-            if (!accountId) {
-                return { status: 400, jsonBody: { error: 'Account ID is required' } };
+            const queryValidation = validateRequest(idQuerySchema, { id: request.query.get('id') });
+            if (queryValidation.error) {
+                return { status: queryValidation.status, jsonBody: { error: queryValidation.error } };
             }
+            const accountId = queryValidation.data.id;
 
             const body = await request.json();
-            const { bank_name, account_mask } = body;
+            const bodyValidation = validateRequest(updateAccountSchema, body);
+            if (bodyValidation.error) {
+                return { status: bodyValidation.status, jsonBody: { error: bodyValidation.error } };
+            }
+
+            const { bank_name, account_mask } = bodyValidation.data;
 
             await connectToDatabase();
 
@@ -85,11 +120,12 @@ app.http('deleteAccount', {
             if (auth.error) {
                 return { status: auth.status, jsonBody: { error: auth.error } };
             }
-
-            const accountId = request.query.get('id');
-            if (!accountId) {
-                return { status: 400, jsonBody: { error: 'Account ID is required' } };
+            context.log("heeeeeeeeeeeeeeeeeeeeeeeeeeeeelo", request.query.get('id'))
+            const queryValidation = validateRequest(idQuerySchema, { id: request.query.get('id') });
+            if (queryValidation.error) {
+                return { status: queryValidation.status, jsonBody: { error: queryValidation.error } };
             }
+            const accountId = queryValidation.data.id;
 
             await connectToDatabase();
 

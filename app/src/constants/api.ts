@@ -8,4 +8,4 @@
 // export const API_BASE_URL =
 //   "https://exptracker-function-expensetracker.azurewebsites.net/api";
 
-export const API_BASE_URL = "http://127.0.0.1:7071/api";
+export const API_BASE_URL = "http://10.0.2.2:7072/api";

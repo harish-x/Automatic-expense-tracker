@@ -84,7 +84,11 @@ export async function getAccounts(): Promise<AccountsResult> {
       });
       return res.data;
     });
-    return { accounts: data.accounts ?? [] };
+    const accounts = (data.accounts ?? []).map((acc: any) => ({
+      ...acc,
+      id: acc._id,
+    }));
+    return { accounts };
   } catch (err: unknown) {
     return { error: extractError(err), authExpired: isAuthExpired(err) };
   }
@@ -101,7 +105,8 @@ export async function createAccount(bank_name: string, account_mask: string): Pr
       );
       return res.data;
     });
-    return { account: data.account };
+    const account = data.account ? { ...data.account, id: data.account._id } : undefined;
+    return { account };
   } catch (err: unknown) {
     return { error: extractError(err), authExpired: isAuthExpired(err) };
   }
@@ -122,7 +127,8 @@ export async function updateAccount(
       );
       return res.data;
     });
-    return { account: data.account };
+    const account = data.account ? { ...data.account, id: data.account._id } : undefined;
+    return { account };
   } catch (err: unknown) {
     return { error: extractError(err), authExpired: isAuthExpired(err) };
   }

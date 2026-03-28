@@ -500,9 +500,9 @@ export default function SettingsScreen() {
               No bank accounts added yet
             </Text>
           ) : (
-            accounts.map((acc) => (
+            accounts.map((acc, index) => (
               <View
-                key={acc.id}
+                key={acc.id ?? `acc-${index}`}
                 style={[styles.accountListRow, { borderTopColor: c.border }]}
               >
                 <View style={styles.accIconBox}>

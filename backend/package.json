@@ -14,7 +14,8 @@
     "bcryptjs": "^2.4.3",
     "jsonwebtoken": "^9.0.0",
     "mongodb": "^5.0.0",
-    "mongoose": "^9.3.3"
+    "mongoose": "^9.3.3",
+    "zod": "^4.3.6"
   },
   "main": "src/index.js"
 }
