@@ -26,7 +26,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 import LoginScreen from '@/screens/LoginScreen';
 import NoNetworkScreen from '@/screens/NoNetworkScreen';
-import { checkAndSaveSms } from '@/services/smsService';
+import { checkAndSaveSms, startSmsListener } from '@/services/smsService';
 import { syncTransactions } from '@/services/syncService';
 import { registerBackgroundSync } from '@/tasks/backgroundSync';
 
@@ -90,15 +90,19 @@ function AppLayout() {
     // 2. Run immediately on login / app open
     runAutoSync();
 
-    // 3. Run every time the app comes back to the foreground
+    // 3. React instantly to any incoming bank SMS while the app is open
+    const stopSmsListener = startSmsListener(runAutoSync);
+
+    // 4. Run every time the app comes back to the foreground
     const appStateSub = AppState.addEventListener('change', (state: AppStateStatus) => {
       if (state === 'active') runAutoSync();
     });
 
-    // 4. Run on a timer while the app stays in the foreground
+    // 5. Run on a timer while the app stays in the foreground
     const foregroundTimer = setInterval(runAutoSync, FOREGROUND_INTERVAL_MS);
 
     return () => {
+      stopSmsListener();
       appStateSub.remove();
       clearInterval(foregroundTimer);
     };

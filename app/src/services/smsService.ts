@@ -9,33 +9,35 @@
 
 import { PermissionsAndroid, Platform } from "react-native";
 import SmsAndroid from "react-native-get-sms-android";
+import SmsListener from "react-native-android-sms-listener";
 
 import { insertTransaction, transactionExists } from "./dbService";
 import { parseBankSms } from "@/utils/smsParser";
 
 // ─── Permission ───────────────────────────────────────────────────────────────
 
-/** Asks for READ_SMS permission if not already granted. Returns true if granted. */
+/** Asks for READ_SMS and RECEIVE_SMS permissions if not already granted. Returns true if both granted. */
 export async function requestSmsPermission(): Promise<boolean> {
   if (Platform.OS !== "android") return false;
 
-  const already = await PermissionsAndroid.check(
+  const readAlready = await PermissionsAndroid.check(
     PermissionsAndroid.PERMISSIONS.READ_SMS,
   );
-  if (already) return true;
+  const receiveAlready = await PermissionsAndroid.check(
+    PermissionsAndroid.PERMISSIONS.RECEIVE_SMS,
+  );
 
-  const result = await PermissionsAndroid.request(
+  if (readAlready && receiveAlready) return true;
+
+  const results = await PermissionsAndroid.requestMultiple([
     PermissionsAndroid.PERMISSIONS.READ_SMS,
-    {
-      title: "SMS Permission Needed",
-      message:
-        "Finance Tracker reads your bank SMS messages to track income and expenses. " +
-        "No messages are shared without your consent.",
-      buttonPositive: "Allow",
-      buttonNegative: "Deny",
-    },
+    PermissionsAndroid.PERMISSIONS.RECEIVE_SMS,
+  ]);
+
+  return (
+    results[PermissionsAndroid.PERMISSIONS.READ_SMS] === PermissionsAndroid.RESULTS.GRANTED &&
+    results[PermissionsAndroid.PERMISSIONS.RECEIVE_SMS] === PermissionsAndroid.RESULTS.GRANTED
   );
-  return result === PermissionsAndroid.RESULTS.GRANTED;
 }
 
 // ─── Read inbox ───────────────────────────────────────────────────────────────
@@ -122,4 +124,24 @@ export async function checkAndSaveSms(): Promise<number> {
   }
 
   return saved;
+}
+
+// ─── Real-time listener ───────────────────────────────────────────────────────
+
+/**
+ * Subscribes to incoming SMS in real-time.
+ * Calls `onNewBankSms` immediately whenever a bank SMS arrives while the app is open.
+ * Returns an unsubscribe function — call it on cleanup.
+ */
+export function startSmsListener(onNewBankSms: () => void): () => void {
+  if (Platform.OS !== "android") return () => {};
+
+  const subscription = SmsListener.addListener((message) => {
+    if (/HDFC|ICICI|SBI|KOTAK|AXIS/i.test(message.originatingAddress ?? "") ||
+        /HDFC|ICICI|SBI|KOTAK|AXIS/i.test(message.body)) {
+      onNewBankSms();
+    }
+  });
+
+  return () => subscription.remove();
 }

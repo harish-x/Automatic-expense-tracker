@@ -22,6 +22,7 @@ import { LineChart, PieChart } from 'react-native-gifted-charts';
 
 import { CATEGORY_LABELS, getCategoryColor } from '@/constants/categories';
 import { getAccounts } from '@/services/accountService';
+import { checkAndSaveSms } from '@/services/smsService';
 import { syncTransactions } from '@/services/syncService';
 import { fetchCategoryBreakdown, fetchStatistics, fetchSpendingTrend, CategoryBreakdownResponse, StatisticsResponse, SpendingTrendResponse } from '@/services/transactionService';
 import { useTransactions } from '@/hooks/useTransactions';
@@ -197,6 +198,7 @@ export default function DashboardScreen() {
   const handleSync = useCallback(async () => {
     setSyncing(true);
     setSyncMsg('');
+    await checkAndSaveSms();
     const result = await syncTransactions();
     setSyncing(false);
     if (result.authExpired) {
